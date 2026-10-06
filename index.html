@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NELT B2C 공동구매 구매자 설문 통합 결과</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ink:#191f28; --sub:#4e5968; --faint:#8b95a1;
+  --line:#e5e8eb; --bg:#f2f4f6; --card:#ffffff;
+  --navy:#142a63; --navy-wash:#eef1f9;
+  --blue:#3558b8; --blue-wash:#e9eefb;
+  --accent:#e1540c; --accent-wash:#fdf0e7;
+  --teal:#0e8f84; --teal-wash:#e7f5f3;
+  --track:#eef0f3;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{ font-family:"Pretendard",-apple-system,"Noto Sans KR","Malgun Gothic",sans-serif;
+  background:var(--bg); color:var(--ink); letter-spacing:-0.01em; line-height:1.6;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.wrap{ max-width:880px; margin:0 auto; padding:40px 20px 60px; }
+
+.head{ background:var(--navy); color:#fff; border-radius:16px; padding:32px 36px; }
+.head .kicker{ font-size:13px; font-weight:600; color:#f0a429; letter-spacing:.03em; margin-bottom:10px; }
+.head h1{ font-size:27px; font-weight:800; letter-spacing:-0.02em; line-height:1.3; }
+.head .meta{ margin-top:12px; font-size:13px; color:#b9c3dd; }
+.head .meta span+span::before{ content:"·"; margin:0 8px; opacity:.5; }
+
+.kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px; }
+.kpi{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+.kpi.hl{ background:var(--accent-wash); border-color:#f3cdb4; }
+.kpi .lab{ font-size:12px; font-weight:600; color:var(--faint); }
+.kpi .val{ font-size:23px; font-weight:800; letter-spacing:-0.02em; margin-top:4px; color:var(--navy); }
+.kpi.hl .val{ color:var(--accent); }
+.kpi .val small{ font-size:13px; font-weight:600; color:var(--sub); }
+.kpi .sub{ font-size:12px; color:var(--faint); margin-top:3px; }
+
+.sec{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px 30px; margin-top:14px; }
+.st{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+.st .n{ font-size:14px; font-weight:800; color:var(--accent); }
+.st h2{ font-size:19px; font-weight:800; letter-spacing:-0.02em; }
+.st .note{ font-size:13px; color:var(--faint); margin-left:auto; }
+.lead{ font-size:14.5px; color:var(--sub); margin-bottom:18px; }
+.lead b{ color:var(--navy); font-weight:700; }
+ul.bl{ list-style:none; margin:0; padding:0; }
+ul.bl li{ position:relative; padding-left:15px; margin:4px 0; }
+ul.bl li::before{ content:"•"; position:absolute; left:2px; top:0; color:var(--accent); font-weight:700; }
+.lead ul.bl li::before{ color:var(--faint); }
+
+/* 채널 범례 */
+.legend{ display:flex; gap:16px; font-size:12.5px; color:var(--sub); margin-bottom:14px; }
+.legend .k{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.chart h4{ font-size:13.5px; font-weight:700; margin-bottom:2px; }
+.chart .cnote{ font-size:11.5px; color:var(--faint); margin-bottom:10px; }
+
+/* 비교 막대(채널 2계열) */
+.grp{ margin:10px 0 12px; }
+.grp .glab{ font-size:12.5px; color:var(--sub); margin-bottom:3px; }
+.grow{ display:grid; grid-template-columns:1fr 86px; align-items:center; gap:8px; margin:2px 0; font-size:12px; }
+.grow .track{ background:var(--track); border-radius:4px; height:14px; }
+.grow .bar{ height:14px; border-radius:4px; min-width:2px; }
+.grow .bar.sa{ background:var(--blue); }
+.grow .bar.dc{ background:var(--accent); }
+.grow .rval{ font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
+.grow .rval small{ font-weight:500; color:var(--faint); }
+
+/* 단일 막대 */
+.row{ display:grid; grid-template-columns:128px 1fr 80px; align-items:center; gap:8px; margin:7px 0; font-size:12.5px; }
+.row .rlab{ color:var(--sub); text-align:right; line-height:1.3; }
+.row .track{ background:var(--track); border-radius:4px; height:18px; }
+.row .bar{ height:18px; border-radius:4px; background:var(--blue); min-width:2px; }
+.row .bar.hl{ background:var(--accent); }
+.row .rval{ font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
+.row .rval small{ font-weight:500; color:var(--faint); }
+
+/* 100% 스택 */
+.stack{ display:flex; height:24px; border-radius:6px; overflow:hidden; gap:2px; margin:6px 0 4px; }
+.stack .sg{ display:flex; align-items:center; justify-content:center; color:#fff; font-size:11.5px; font-weight:700; min-width:6px; white-space:nowrap; }
+.stack .sg .pct{ font-weight:400; opacity:.9; margin-left:5px; }
+.slab{ font-size:12.5px; font-weight:700; color:var(--sub); margin-top:10px; }
+
+.insight{ background:var(--navy-wash); border-radius:10px; padding:14px 18px; margin-top:16px; font-size:14px; }
+.insight b{ color:var(--navy); font-weight:700; }
+.insight .tag{ display:inline-block; background:var(--navy); color:#fff; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; margin-right:8px; vertical-align:1px; }
+
+.tblwrap{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:620px; }
+thead th{ text-align:left; font-size:12.5px; font-weight:700; color:#fff; background:var(--navy); padding:9px 14px; }
+thead th:first-child{ border-radius:8px 0 0 8px; }
+thead th:last-child{ border-radius:0 8px 8px 0; }
+tbody td{ padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+tbody tr:last-child td{ border-bottom:none; }
+td b{ font-weight:700; color:var(--navy); }
+.chip-sa{ display:inline-block; background:var(--blue-wash); color:var(--blue); font-weight:700; font-size:11.5px; padding:2px 8px; border-radius:4px; }
+.chip-dc{ display:inline-block; background:var(--accent-wash); color:var(--accent); font-weight:700; font-size:11.5px; padding:2px 8px; border-radius:4px; }
+
+.vocs{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.voc{ background:var(--bg); border-radius:10px; padding:16px 18px; }
+.voc .vh{ display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.voc .vh h3{ font-size:14.5px; font-weight:800; color:var(--navy); }
+.voc .vh .cnt{ font-size:11.5px; font-weight:700; color:var(--accent); background:var(--accent-wash); padding:1px 7px; border-radius:4px; }
+.voc .vh .new{ font-size:11px; font-weight:700; color:var(--teal); background:var(--teal-wash); padding:1px 7px; border-radius:4px; }
+.voc p{ font-size:12.5px; color:var(--sub); }
+.voc .qq{ margin-top:8px; font-size:12px; color:var(--ink); background:#fff; border-left:3px solid var(--line); border-radius:0 6px 6px 0; padding:7px 11px; }
+.voc .xref{ margin-top:8px; font-size:12px; line-height:1.6; color:var(--ink); background:var(--teal-wash); border-radius:6px; padding:7px 11px; }
+.voc .xref .xtag{ display:inline-block; background:var(--teal); color:#fff; font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:3px; margin-right:6px; vertical-align:1px; }
+
+.sec.warn{ background:var(--accent-wash); border-color:#f3cdb4; }
+.sec.warn .st h2{ color:#b8430a; }
+.sec.warn p{ font-size:14px; }
+.sec.warn b{ font-weight:700; color:#b8430a; }
+.nexts{ counter-reset:nx; }
+.next{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); font-size:14px; }
+.next:last-child{ border-bottom:none; }
+.next::before{ counter-increment:nx; content:counter(nx); flex:0 0 24px; height:24px; background:var(--navy); color:#fff;
+  border-radius:7px; font-size:12.5px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+.next b{ color:var(--navy); }
+
+.footer{ margin-top:24px; text-align:center; font-size:12px; color:var(--faint); }
+
+@media (max-width:660px){
+  .kpis{ grid-template-columns:1fr 1fr; }
+  .grid2,.vocs{ grid-template-columns:1fr; }
+  .head{ padding:24px; } .head h1{ font-size:21px; }
+  .sec{ padding:20px; }
+  .row{ grid-template-columns:100px 1fr 72px; }
+}
+@media print{
+  body{ background:#fff; }
+  .wrap{ max-width:none; padding:0; }
+  .sec,.kpi,.voc{ break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="kicker">NELT B2C 공동구매 · 사월이네공부방 + 도치맘</div>
+    <h1>구매자 설문 통합 결과 보고</h1>
+    <div class="meta"><span>총 응답 273명 — 사월이네 124명(9/4–9/7) · 도치맘 149명(9/14–9/17)</span><span>영업마케팅팀 정초원 · 2026. 9. 21.</span></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi hl"><div class="lab">구매 이유 1위 (공통)</div><div class="val">85%</div><div class="sub">"객관적 실력 확인" 232명</div></div>
+    <div class="kpi"><div class="lab">재응시 의향 긍정</div><div class="val">98%</div><div class="sub">"매우 있다" 76% (208명)</div></div>
+    <div class="kpi"><div class="lab">패키지 수용</div><div class="val">87%</div><div class="sub">적극 20% + 조건부 67%</div></div>
+    <div class="kpi"><div class="lab">채널 간 스필오버</div><div class="val">25%</div><div class="sub">도치맘 구매자 중 사월이네로 먼저 인지</div></div>
+  </div>
+
+  <!-- 00 채널 한눈 비교 -->
+  <div class="sec">
+    <div class="st"><span class="n">00</span><h2>채널별 결과 요약</h2><span class="note">파랑 = 사월이네 · 주황 = 도치맘</span></div>
+    <div class="lead"><ul class="bl">
+      <li>두 채널 모두 <b>'객관적 진단' 니즈</b>가 팔았다는 점은 동일함.</li>
+      <li>다만 <b>구매자 구성과 상품 선택은 상이함</b> — 도치맘은 학년이 높고 학원생·맛보기(1회권) 비중이 큼.</li>
+    </ul></div>
+    <div class="tblwrap">
+    <table>
+      <thead><tr><th style="width:20%">구분</th><th style="width:40%"><span style="color:#9db4e8">■</span> 사월이네 (n=124)</th><th><span style="color:#f0a984">■</span> 도치맘 (n=149)</th></tr></thead>
+      <tbody>
+        <tr><td><b>전형 구매자</b></td><td>초1~초4 자녀 1명 · 엄마표(46%)</td><td>초3~초6 자녀 1~2명 · 학원생(44%)이 엄마표(40%)보다 많음</td></tr>
+        <tr><td><b>상품 믹스</b></td><td>3+1 63% / 6+3 27% / 1회 10% — 고회차형</td><td>3+1 64% / 1회 27% / 6+3 9% — 맛보기형</td></tr>
+        <tr><td><b>3+1 구매 용도</b></td><td>한 자녀 정기 응시 79%</td><td>정기 59% + 다자녀 분산 34%</td></tr>
+        <tr><td><b>재응시 의향</b></td><td>긍정 100% (매우 79%)</td><td>긍정 96% (매우 74%) · 부정·유보 6명</td></tr>
+        <tr><td><b>패키지 관심</b></td><td>NE Times 39% &gt; 큐레이션 33%</td><td>NE Times 31% &gt; 큐레이션 26% &gt; <b>베스트셀러 교재 21%</b>(내신·수능)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- 01 누가 사나 -->
+  <div class="sec">
+    <div class="st"><span class="n">01</span><h2>구매자 특성 분석 — 채널별 타깃이 상이함</h2><span class="note">Q1 · Q2 · Q7</span></div>
+    <div class="lead"><ul class="bl">
+      <li>도치맘은 사월이네보다 <b>학년이 한 단계 높음</b> (초5~6 50% vs 19%).</li>
+      <li><b>학원 재원 비중도 더 높음</b> (44% vs 35%).</li>
+      <li>자녀 2명 이상 가구도 더 많음 (32% vs 26%).</li>
+    </ul></div>
+    <div class="legend"><span><span class="k" style="background:var(--blue)"></span>사월이네 (n=124)</span><span><span class="k" style="background:var(--accent)"></span>도치맘 (n=149)</span></div>
+
+    <div class="grid2">
+      <div class="chart">
+        <h4>자녀 학년 <span style="color:var(--faint);font-weight:500">(Q2 · 복수 선택, 채널 내 비율)</span></h4>
+        <div class="cnote">&nbsp;</div>
+        <div class="grp"><div class="glab">예비초~초2</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:88%"></div></div><span class="rval">54<small> · 44%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:32%"></div></div><span class="rval">24<small> · 16%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">초3~초4</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:96%"></div></div><span class="rval">60<small> · 48%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:100%"></div></div><span class="rval">75<small> · 50%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">초5~초6</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:37%"></div></div><span class="rval">23<small> · 19%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:99%"></div></div><span class="rval">74<small> · 50%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">중학생 이상</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:13%"></div></div><span class="rval">8<small> · 6%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:23%"></div></div><span class="rval">17<small> · 11%</small></span></div>
+        </div>
+      </div>
+      <div class="chart">
+        <h4>현재 영어 학습 방식 <span style="color:var(--faint);font-weight:500">(Q7 · 복수 선택, 채널 내 비율)</span></h4>
+        <div class="cnote">기타(과외·화상영어 단독 기재 등) 제외</div>
+        <div class="grp"><div class="glab">엄마표·자기주도</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:100%"></div></div><span class="rval">57<small> · 46%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:86%"></div></div><span class="rval">59<small> · 40%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">영어학원</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:76%"></div></div><span class="rval">43<small> · 35%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:96%"></div></div><span class="rval">66<small> · 44%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">학습지·화상영어 등</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:37%"></div></div><span class="rval">21<small> · 17%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:22%"></div></div><span class="rval">15<small> · 10%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">자녀 2명 이상 (Q1)</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:57%"></div></div><span class="rval">32<small> · 26%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:69%"></div></div><span class="rval">47<small> · 32%</small></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight"><span class="tag">INSIGHT</span><ul class="bl" style="margin-top:6px">
+      <li>사월이네가 '엄마표 저학년' 채널이라면, 도치맘은 <b>'학원 병행 초등 중·고학년' 채널</b>임.</li>
+      <li>같은 상품이 채널마다 다른 구매자를 데려옴.</li>
+      <li>확장 채널 선정 시 카페의 주 이용층 학년대가 곧 타깃 세그먼트가 됨.</li>
+    </ul></div>
+  </div>
+
+  <!-- 02 왜 사나 -->
+  <div class="sec">
+    <div class="st"><span class="n">02</span><h2>구매 결정 요인 — 가격이 아닌 '객관적 진단'이 구매를 견인</h2><span class="note">Q3 · Q4</span></div>
+    <div class="lead"><ul class="bl">
+      <li>"객관적 실력 확인"이 <b>사월이네 81% · 도치맘 89%</b> — 채널이 달라도 파는 것은 진단 니즈임.</li>
+      <li>할인 가격을 1순위로 꼽은 응답은 273명 중 4명에 불과함.</li>
+    </ul></div>
+
+    <div class="grid2">
+      <div class="chart">
+        <h4>도치맘 인지 경로 <span style="color:var(--faint);font-weight:500">(Q4 · 주관식 분류)</span></h4>
+        <div class="cnote">n=149</div>
+        <div class="row"><span class="rlab">도치맘 카페·인스타</span><div class="track"><div class="bar hl" style="width:100%"></div></div><span class="rval">87<small> · 58%</small></span></div>
+        <div class="row"><span class="rlab">사월이네 채널</span><div class="track"><div class="bar" style="width:43%"></div></div><span class="rval">37<small> · 25%</small></span></div>
+        <div class="row"><span class="rlab">지인 공유</span><div class="track"><div class="bar" style="width:23%"></div></div><span class="rval">20<small> · 13%</small></span></div>
+        <div class="row"><span class="rlab">기타(검색·타 카페)</span><div class="track"><div class="bar" style="width:6%"></div></div><span class="rval">5<small> · 3%</small></span></div>
+      </div>
+      <div class="chart">
+        <h4>사월이네 인지 경로 <span style="color:var(--faint);font-weight:500">(Q4 · 1차 조사)</span></h4>
+        <div class="cnote">n=124</div>
+        <div class="row"><span class="rlab">사월이네 카페 글</span><div class="track"><div class="bar hl" style="width:100%"></div></div><span class="rval">78<small> · 63%</small></span></div>
+        <div class="row"><span class="rlab">사월이네 인스타그램</span><div class="track"><div class="bar" style="width:53%"></div></div><span class="rval">41<small> · 33%</small></span></div>
+        <div class="row"><span class="rlab">지인 공유</span><div class="track"><div class="bar" style="width:5%"></div></div><span class="rval">4<small> · 3%</small></span></div>
+        <div class="row"><span class="rlab">네이버 검색</span><div class="track"><div class="bar" style="width:1%"></div></div><span class="rval">1<small> · 1%</small></span></div>
+      </div>
+    </div>
+
+    <div class="insight"><span class="tag">INSIGHT</span><ul class="bl" style="margin-top:6px">
+      <li>도치맘 구매자 4명 중 1명은 <b>사월이네 채널(인스타 21·카페 14·유튜브 2)에서 먼저 접함</b>.</li>
+      <li>1차 공구의 노출이 2차 공구의 전환을 데워준 스필오버 효과임.</li>
+      <li>공구를 채널별 단발 이벤트가 아닌 <b>연속 캠페인</b>으로 보면 회차가 거듭될수록 전환이 쉬워짐.</li>
+      <li>지인 공유도 3%→13%로 확대 — 입소문이 돌기 시작함.</li>
+    </ul></div>
+  </div>
+
+  <!-- 03 상품 구성 -->
+  <div class="sec">
+    <div class="st"><span class="n">03</span><h2>상품 구성 분석 — 채널 신뢰도에 따라 구매 회차가 갈림</h2><span class="note">Q5 · Q6</span></div>
+    <div class="lead"><ul class="bl">
+      <li>3+1회권이 양쪽 모두 60%대로 1위.</li>
+      <li>차이는 2위 상품 — 사월이네는 <b>6+3회권(27%)</b>, 도치맘은 <b>1회권(26%)</b>.</li>
+    </ul></div>
+
+    <div class="slab">사월이네 (설문 n=124 · 실판매 67 / 23 / 10%와 유사)</div>
+    <div class="stack">
+      <div class="sg" style="flex:63;background:var(--blue)">3+1회권<span class="pct">63%</span></div>
+      <div class="sg" style="flex:27;background:var(--teal)">6+3회권<span class="pct">27%</span></div>
+      <div class="sg" style="flex:10;background:#8b95a1">1회권<span class="pct">10%</span></div>
+    </div>
+    <div class="slab">도치맘 (설문 n=149)</div>
+    <div class="stack">
+      <div class="sg" style="flex:64;background:var(--blue)">3+1회권<span class="pct">64%</span></div>
+      <div class="sg" style="flex:9;background:var(--teal)">6+3회권<span class="pct">9%</span></div>
+      <div class="sg" style="flex:27;background:#8b95a1">1회권<span class="pct">27%</span></div>
+    </div>
+
+    <div class="tblwrap" style="margin-top:18px">
+    <table>
+      <thead><tr><th style="width:18%">상품</th><th style="width:41%"><span style="color:#9db4e8">■</span> 사월이네 — 선택 이유</th><th><span style="color:#f0a984">■</span> 도치맘 — 선택 이유</th></tr></thead>
+      <tbody>
+        <tr><td><b>3+1회권</b></td><td>한 자녀 정기 응시 <b>79%</b> · 다자녀 10%</td><td>한 자녀 정기 응시 <b>59%</b> · 다자녀 <b>34%</b> — 2자녀 가구가 많아 분산 용도 증가</td></tr>
+        <tr><td><b>6+3회권</b></td><td>다자녀 분산 61% · 재응시 "매우" 88%</td><td>14건에 그침 — 신규 채널 첫 공구라 고회차 신뢰가 아직 없음</td></tr>
+        <tr><td><b>1회권</b></td><td>"우선 한 번" 85% — 맛보기 유효</td><td>"우선 한 번" <b>88%</b> — 40건으로 확대, 첫 채널일수록 맛보기 수요 큼</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="insight"><span class="tag">INSIGHT</span><ul class="bl" style="margin-top:6px">
+      <li>신규 채널의 첫 공구는 <b>맛보기(1회권) 진입 → 재공구에서 고회차 전환</b>이 자연스러운 경로임.</li>
+      <li>도치맘 1회권 구매자 40명은 2차 공구의 3+1회권 전환 타깃.</li>
+      <li>사월이네에서 6+3회권이 팔린 것도 오래 쌓인 채널 신뢰의 결과로 해석됨.</li>
+    </ul></div>
+  </div>
+
+  <!-- 04 다시 사나 -->
+  <div class="sec">
+    <div class="st"><span class="n">04</span><h2>재구매·확장성 검증 — 정기 진단·패키지 모델 근거 확보</h2><span class="note">Q8 · Q9 · Q10</span></div>
+    <div class="lead"><ul class="bl">
+      <li>재응시 의향 긍정이 통합 <b>98% (273명 중 267명)</b>.</li>
+      <li>패키지 수용도는 87%로 두 채널이 동일함.</li>
+      <li>단, 관심 상품 순위는 채널 페르소나를 그대로 따라감.</li>
+    </ul></div>
+
+    <div class="chart">
+      <h4>재응시 의향 <span style="color:var(--faint);font-weight:500">(Q8)</span></h4>
+      <div class="slab" style="margin-top:4px">사월이네</div>
+      <div class="stack" style="height:22px">
+        <div class="sg" style="flex:79;background:var(--blue)">매우 79%</div>
+        <div class="sg" style="flex:21;background:var(--teal)">어느 정도 21%</div>
+      </div>
+      <div class="slab">도치맘</div>
+      <div class="stack" style="height:22px">
+        <div class="sg" style="flex:73.8;background:var(--blue)">매우 74%</div>
+        <div class="sg" style="flex:22.2;background:var(--teal)">어느 정도 22%</div>
+        <div class="sg" style="flex:4;background:#8b95a1" title="잘 모르겠다 5명 · 없다 1명">4%</div>
+      </div>
+      <div class="cnote" style="margin-top:6px">회색 = 잘 모르겠다 5명 + 없다 1명 (도치맘에서만 발생)</div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="chart">
+        <h4>패키지 구매 의향 <span style="color:var(--faint);font-weight:500">(Q10 · 통합 n=273)</span></h4>
+        <div class="cnote">채널 간 차이 미미 (적극 22% vs 19%)</div>
+        <div class="row"><span class="rlab">가격·구성 보고 결정</span><div class="track"><div class="bar" style="width:100%"></div></div><span class="rval">182<small> · 67%</small></span></div>
+        <div class="row"><span class="rlab">적극 구매하고 싶다</span><div class="track"><div class="bar hl" style="width:30%"></div></div><span class="rval">55<small> · 20%</small></span></div>
+        <div class="row"><span class="rlab">진단만 필요</span><div class="track"><div class="bar" style="width:15%"></div></div><span class="rval">26<small> · 10%</small></span></div>
+        <div class="row"><span class="rlab">잘 모르겠다</span><div class="track"><div class="bar" style="width:6%"></div></div><span class="rval">10<small> · 4%</small></span></div>
+      </div>
+      <div class="chart">
+        <h4>패키지 관심 상품 <span style="color:var(--faint);font-weight:500">(Q9 · 복수 선택, 채널 내 비율)</span></h4>
+        <div class="legend" style="margin-bottom:8px"><span><span class="k" style="background:var(--blue)"></span>사월이네</span><span><span class="k" style="background:var(--accent)"></span>도치맘</span></div>
+        <div class="grp"><div class="glab">NE Times 영자신문·화상영어</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:100%"></div></div><span class="rval">48<small> · 39%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:79%"></div></div><span class="rval">46<small> · 31%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">진단 + 맞춤 교재 큐레이션</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:85%"></div></div><span class="rval">41<small> · 33%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:65%"></div></div><span class="rval">38<small> · 26%</small></span></div>
+        </div>
+        <div class="grp"><div class="glab">NE능률 베스트셀러 교재 (내신·수능)</div>
+          <div class="grow"><div class="track"><div class="bar sa" style="width:17%"></div></div><span class="rval">8<small> · 6%</small></span></div>
+          <div class="grow"><div class="track"><div class="bar dc" style="width:54%"></div></div><span class="rval">32<small> · 21%</small></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight"><span class="tag">INSIGHT</span><ul class="bl" style="margin-top:6px">
+      <li>도치맘에서 <b>베스트셀러 교재(능률VOCA·리딩튜터) 관심이 6%→21%로 급증</b>.</li>
+      <li>학년 높은 채널일수록 내신·수능 라인 패키지가 유효함.</li>
+      <li>패키지는 채널(학년대)별로 구성을 달리 제안하는 것이 적절함.</li>
+    </ul></div>
+  </div>
+
+  <!-- 05 VOC -->
+  <div class="sec">
+    <div class="st"><span class="n">05</span><h2>설문 VOC 분석 — 개선 과제 도출</h2><span class="note">유효 의견 사월이네 65건 + 도치맘 65건</span></div>
+    <div class="lead"><ul class="bl">
+      <li>두 채널 모두 <b>재공구·정기화 요청이 최다</b>.</li>
+      <li>도치맘에서 형제 응시·결과 연계 등 새 테마가 추가 확인됨.</li>
+    </ul></div>
+    <div class="vocs">
+      <div class="voc">
+        <div class="vh"><h3>재공구·정기화 요청</h3><span class="cnt">약 25건 · 양 채널 최다</span></div>
+        <ul class="bl"><li>"정가는 부담, 공구는 기다린다"가 공통 정서.</li><li>정기 진단 수요의 직접 증거임.</li></ul>
+        <div class="qq">"아이 레벨 꾸준히 비교하려고 정기적으로 공구 자주 부탁드려요" · "2~3개월에 한 번 응시 시점 알림도 좋겠어요"</div>
+      </div>
+      <div class="voc">
+        <div class="vh"><h3>쿠폰·사용기한</h3><span class="cnt">약 13건</span></div>
+        <ul class="bl"><li>등록 후 30일 소진 부담, 코드 분실 불안, 기한 확인 어려움.</li><li>양 채널 공통 최다 '개선' 요구임.</li></ul>
+        <div class="qq">"다회권은 한 번에 등록해두고 회차별로 쓰게 해주세요" · "구매한 폰 번호 인증으로 간편 등록되면 좋겠어요"</div>
+      </div>
+      <div class="voc">
+        <div class="vh"><h3>결과지·진단 고도화</h3><span class="cnt">약 12건</span></div>
+        <ul class="bl"><li>AR·렉사일 병기, 레벨 세분화, 틀린 문제 확인 요구.</li><li>결과 연계 교재·구독 추천 요구 — 타 출판사 포함 요구도 있음.</li></ul>
+        <div class="qq">"NE Times 구독 중인데 결과에 맞춰 어느 단계로 구독할지 추천해주면 좋겠어요"</div>
+      </div>
+      <div class="voc">
+        <div class="vh"><h3>형제 응시·계정 관리</h3><span class="cnt">약 5건</span><span class="new">도치맘 신규</span></div>
+        <ul class="bl"><li>형제 동시 응시 불가, 형제간 동일 시험지 출제 문제.</li><li>프로필 오입력 시 결과 추적이 단절됨.</li></ul>
+        <div class="qq">"4·6학년 둘이 봤는데 시험지가 같았어요" · "성별을 잘못 입력했더니 결과 연동이 안 돼요"</div>
+      </div>
+      <div class="voc">
+        <div class="vh"><h3>신뢰도·난이도 인식</h3><span class="cnt">약 8건</span></div>
+        <ul class="bl"><li>"점수가 후하다"는 인식(양 채널 공통), 문제 중복 체감.</li><li>표본·기준 공개 요구, 저학년 시험시간 부담.</li></ul>
+        <div class="qq">"표본이 전국 학생 기준인지 NELT 응시생 기준인지 궁금합니다"</div>
+      </div>
+      <div class="voc">
+        <div class="vh"><h3>사이트·구매 오류</h3><span class="cnt">약 7건</span></div>
+        <ul class="bl"><li>가입·결제 오류, 접속 반복 실패, 확인 메일 미발송, 화면 구성 불편.</li><li>1·2차 공구 모두 재발함.</li></ul>
+        <div class="qq">"여러 번 접속 끝에 결제가 완료됐어요"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 참고: 공구 댓글 문의 -->
+  <div class="sec">
+    <div class="st"><span class="n">06</span><h2>참고 — 도치맘 공구 게시글 댓글 문의 현황</h2><span class="note">설문과 별개 데이터 · 게시글 댓글 330개 중 추출 표본 기준</span></div>
+    <div class="lead"><ul class="bl">
+      <li>설문 결과와는 <b>별개로</b>, 공구 게시글 댓글에서도 아래와 같은 고객 문의가 관찰됨.</li>
+      <li>구매 단계(응시 전)에서 이미 나온 문의라는 점에서, 설문 VOC(응시 후 의견)와 함께 보면 고객 여정 전반의 마찰 지점을 파악할 수 있음.</li>
+    </ul></div>
+    <div class="tblwrap">
+    <table>
+      <thead><tr><th style="width:24%">문의 유형</th><th style="width:12%">건수(약)</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td><b>쿠폰 사용기한</b></td><td>12건</td><td>유효기간, 등록 전 보관 가능 여부, "1년 뒤 등록해도 되나" 등 — 본문에 안내('등록 전 무기한·등록 후 30일')가 있음에도 반복 문의됨. 이번 공구부터 등록 전 보관이 무기한으로 바뀐 점(기존 6개월)은 호평.</td></tr>
+        <tr><td><b>쿠폰 발송 시점</b></td><td>8건</td><td>"결제했는데 문자가 안 온다" — 공구 종료 후 일괄 발송(9/11) 정책을 모르고 문의. 종료 직후 구매·품절 표기 혼선 문의도 있음.</td></tr>
+        <tr><td><b>가족·형제 활용</b></td><td>7건</td><td>쿠폰 가족·지인 공유 가능 여부, 형제별 계정 분리 방법, "형제가 같은 문제를 받나" 등 다자녀 활용 문의.</td></tr>
+        <tr><td><b>응시 주기</b></td><td>3건</td><td>"몇 개월 텀으로 보는 게 좋나" — 담당자 안내는 3~6개월 1회.</td></tr>
+        <tr><td><b>학년 선택 기준</b></td><td>2건</td><td>제 학년 기준인지 실력 수준 기준인지, 높여 설정하면 결과가 어떻게 달라지는지.</td></tr>
+        <tr><td><b>링크·시스템 오류</b></td><td>4건</td><td>구매 링크 오작동, 카카오톡 고객센터 링크 불통 신고.</td></tr>
+        <tr><td><b>신뢰도 언급</b></td><td>1건</td><td>"타 카페·블로그에 점수가 후하게 나온다는 글이 많던데" — 외부 커뮤니티 인식을 직접 인용한 문의.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="insight"><span class="tag">참고</span><ul class="bl" style="margin-top:6px">
+      <li>댓글 문의의 상위 주제(사용기한, 형제 활용, 응시 주기, 오류)가 설문 VOC의 개선 요구와 같은 주제임 — 두 데이터가 서로를 뒷받침함.</li>
+      <li>구매 요청·재공구 감사 댓글도 다수 — 이번 도치맘 공구는 회원의 공구 요청으로 개설된 건.</li>
+    </ul></div>
+  </div>
+
+  <!-- 06 유의 -->
+  <div class="sec warn">
+    <div class="st"><span class="n">!</span><h2>결과 해석 시 유의사항</h2></div>
+    <ul class="bl"><li>응답자는 두 채널 모두 <b>'이미 산 사람'</b>이라 긍정 편향이 있음.</li><li><b>도치맘 실판매 데이터(결제 건수·금액)는 본 보고서에 미반영</b> — 상품 믹스는 설문 분포 기준임.</li><li>실판매 수치 확보 시 사월이네처럼 교차검증하여 업데이트 가능.</li><li>채널 비교 시 표본 차이(설문 시기·응답률 상이)도 감안할 것.</li></ul>
+  </div>
+
+  <!-- 07 Next -->
+  <div class="sec">
+    <div class="st"><span class="n">07</span><h2>향후 실행 제안</h2></div>
+    <div class="nexts">
+      <div class="next"><div><b>채널별 타깃 운영</b><ul class="bl"><li>확장 맘카페는 주 이용층 학년대 기준으로 선정.</li><li>저학년 채널은 '첫 객관 진단', 고학년 채널은 '내신 대비 위치 확인' 카피.</li><li>공통 헤드라인은 '객관적 진단'.</li></ul></div></div>
+      <div class="next"><div><b>신규 채널 2단계 설계</b><ul class="bl"><li>첫 공구는 1회권·3+1 중심으로 진입, 재공구에서 고회차 전환.</li><li>도치맘 1회권 구매자 40명 = 2차 전환 타깃.</li></ul></div></div>
+      <div class="next"><div><b>공구 캘린더 정례화</b><ul class="bl"><li>스필오버(25%)와 재공구 요청(최다 VOC)이 근거.</li><li>채널 순환형 정기 공구 + 응시 주기(2~3개월) 알림 운영.</li></ul></div></div>
+      <div class="next"><div><b>채널별 패키지 구성</b><ul class="bl"><li>저학년 채널: NE Times·큐레이션 / 고학년 채널: 베스트셀러(내신·수능) 포함안.</li><li>'적극 구매' 응답 54명 우선 리타겟.</li></ul></div></div>
+      <div class="next"><div><b>제품 개선 전달</b><ul class="bl"><li>다회권 사용기한(최다 요구), 형제 응시·시험지 분리, 프로필 수정·결과 연동 개선.</li><li>가입·결제 오류(재발)를 담당 부서에 공유.</li></ul></div></div>
+    </div>
+  </div>
+
+  <div class="footer">NELT B2C 공동구매 구매자 설문 통합 결과 · 사월이네 124명(9/4–9/7) + 도치맘 149명(9/14–9/17) · 영업마케팅팀 정초원</div>
+</div>
+</body>
+</html>
